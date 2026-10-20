@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111111">
+<meta name="description" content="DC Pagos - caja de demostración para DC Modas">
+<link rel="manifest" href="manifest.json">
+<title>DC Pagos | DC Modas</title>
+<style>
+:root{color-scheme:dark;--bg:#0b0b0c;--panel:#151517;--line:#2c2c30;--muted:#a7a7ae;--white:#f7f7f8;--accent:#e8e8e8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{padding:22px 18px 16px;border-bottom:1px solid var(--line);background:#101012;position:sticky;top:0;z-index:2}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;border:1px solid #555;border-radius:12px;display:grid;place-items:center;font-weight:900;letter-spacing:-2px;font-size:18px}
+h1{font-size:21px;margin:0;letter-spacing:.5px}header p{margin:4px 0 0;color:var(--muted);font-size:12px}
+main{max-width:620px;margin:0 auto;padding:18px 14px 40px}.warning{border:1px solid #725d2e;background:#201b10;color:#f4dda6;padding:12px;border-radius:12px;font-size:12px;line-height:1.45;margin-bottom:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:17px;margin-bottom:14px}
+label{display:block;color:#d6d6da;font-size:13px;margin-bottom:7px}
+.amount-wrap{display:flex;align-items:center;gap:8px;border:1px solid #48484e;border-radius:12px;padding:12px 14px;background:#0e0e10}
+.currency{color:var(--muted);font-size:18px}.amount{width:100%;background:transparent;border:0;outline:0;color:white;font-size:32px;font-weight:750;min-width:0}
+input,select{width:100%;border:1px solid #3a3a40;border-radius:10px;padding:12px;background:#0e0e10;color:white;font:inherit}
+.field{margin-top:15px}.buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+button{border:0;border-radius:11px;padding:13px 12px;font-weight:750;font-size:14px;cursor:pointer}
+.primary{background:#f4f4f5;color:#111}.secondary{background:#242428;color:#f5f5f5;border:1px solid #414147}.danger{background:#301b1d;color:#ffb9be;border:1px solid #63363a}
+.status{border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:14px;line-height:1.45;font-size:13px;color:#d6d6da;display:none}
+.status strong{display:block;font-size:15px;margin-bottom:4px;color:white}.status.show{display:block}
+.section-title{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 12px}.section-title h2{font-size:16px;margin:0}.small{font-size:12px;color:var(--muted)}
+.statrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{padding:13px;border:1px solid var(--line);border-radius:12px;background:#101012}.stat span{font-size:12px;color:var(--muted)}.stat b{display:block;font-size:21px;margin-top:5px}
+.history-item{padding:12px 0;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;font-size:13px}.history-item:first-of-type{border-top:0}.history-item b{display:block;margin-bottom:4px}.history-item small{color:var(--muted)}
+footer{text-align:center;color:#77777f;font-size:11px;padding:8px 16px 24px}
+@media(min-width:560px){main{padding-top:24px}.card{padding:20px}}
+</style>
+</head>
+<body>
+<header><div class="brand"><div class="logo">DC</div><div><h1>DC PAGOS</h1><p>Caja digital · DC Modas</p></div></div></header>
+<main>
+<div class="warning"><strong>VERSIÓN DE DEMOSTRACIÓN</strong><br>Esta aplicación todavía no cobra tarjetas ni mueve dinero. Las operaciones guardadas aquí son registros de prueba y no comprobantes de pago.</div>
+<section class="card">
+<div class="section-title"><h2>Nuevo cobro</h2><span class="small">UYU · Pesos uruguayos</span></div>
+<label for="amount">Importe</label>
+<div class="amount-wrap"><span class="currency">$</span><input id="amount" class="amount" type="number" inputmode="decimal" min="1" step="0.01" placeholder="0,00"></div>
+<div class="field"><label for="reference">Referencia de venta (opcional)</label><input id="reference" maxlength="50" placeholder="Ej.: venta #001"></div>
+<div class="field"><label for="method">Método registrado</label><select id="method"><option value="Efectivo">Efectivo</option><option value="Transferencia">Transferencia</option><option value="Tarjeta (simulación)">Tarjeta (simulación)</option></select></div>
+<div class="buttons"><button class="primary" id="start">Registrar operación de prueba</button><button class="secondary" id="clear">Limpiar</button></div>
+<div class="status" id="status" role="status" aria-live="polite"></div>
+</section>
+<section class="card">
+<div class="section-title"><h2>Resumen del día</h2><span class="small" id="today"></span></div>
+<div class="statrow"><div class="stat"><span>Operaciones de prueba</span><b id="count">0</b></div><div class="stat"><span>Total registrado</span><b id="total">$ 0,00</b></div></div>
+</section>
+<section class="card">
+<div class="section-title"><h2>Historial local</h2><button class="secondary" id="export" style="padding:8px 10px;font-size:12px">Exportar CSV</button></div>
+<div id="history" class="small">Todavía no hay operaciones.</div>
+<div class="buttons"><button class="secondary" id="clearHistory">Borrar historial</button><button class="secondary" id="install" hidden>Instalar app</button></div>
+</section>
+</main>
+<footer>DC Pagos · Prototipo privado de DC Modas · No procesa pagos reales</footer>
+<script>
+const $=id=>document.getElementById(id);
+const KEY='dc_pagos_demo_v1';
+let entries=[];
+try{entries=JSON.parse(localStorage.getItem(KEY)||'[]');if(!Array.isArray(entries))entries=[]}catch(e){entries=[]}
+const money=n=>new Intl.NumberFormat('es-UY',{style:'currency',currency:'UYU'}).format(n);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function save(){try{localStorage.setItem(KEY,JSON.stringify(entries))}catch(e){alert('El navegador no pudo guardar los datos. Exportá el historial como CSV.')}render()}
+function render(){
+ const today=new Date().toLocaleDateString('es-UY');$('today').textContent=today;
+ const todays=entries.filter(e=>new Date(e.time).toLocaleDateString('es-UY')===today);
+ $('count').textContent=todays.length;$('total').textContent=money(todays.reduce((s,e)=>s+e.amount,0));
+ if(!entries.length){$('history').textContent='Todavía no hay operaciones.';return}
+ $('history').innerHTML=entries.slice().reverse().map(e=>`<div class="history-item"><div><b>${esc(e.ref||'Sin referencia')}</b><small>${esc(new Date(e.time).toLocaleString('es-UY'))} · ${esc(e.method)} · PRUEBA</small></div><div style="text-align:right;white-space:nowrap"><b>${money(e.amount)}</b><small style="display:block;color:#f4dda6">No pagado</small></div></div>`).join('');
+}
+$('start').addEventListener('click',()=>{
+ const amount=Number($('amount').value);
+ if(!Number.isFinite(amount)||amount<=0){$('status').className='status show';$('status').innerHTML='<strong>Revisá el importe</strong>Ingresá un importe mayor que cero.';return}
+ const entry={id:'DEMO-'+Date.now(),amount:Math.round(amount*100)/100,ref:$('reference').value.trim(),method:$('method').value,time:new Date().toISOString(),status:'DEMO_NO_PAYMENT'};
+ entries.push(entry);save();
+ $('status').className='status show';$('status').innerHTML='<strong>Operación registrada solo como prueba</strong>No se cobró dinero. ID: '+esc(entry.id)+'. No uses esta pantalla como confirmación de un pago real.';
+});
+$('clear').addEventListener('click',()=>{$('amount').value='';$('reference').value='';$('method').value='Efectivo';$('status').className='status';$('status').textContent='';});
+$('clearHistory').addEventListener('click',()=>{if(confirm('¿Borrar todo el historial local? Esta acción no se puede deshacer.')){entries=[];save();$('status').className='status';$('status').textContent='';}});
+$('export').addEventListener('click',()=>{
+ const rows=[['id','fecha','importe_UYU','referencia','metodo','estado'],...entries.map(e=>[e.id,e.time,e.amount,e.ref,e.method,e.status])];
+ const csv=rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
+ const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='dc-pagos-pruebas.csv';a.click();URL.revokeObjectURL(a.href);
+});
+let installPrompt;$('install').addEventListener('click',async()=>{if(installPrompt){installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;$('install').hidden=true}});
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;$('install').hidden=false});
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+render();
+</script>
+</body>
+</html>
